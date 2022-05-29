@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
+import 'hardhat/console.sol';
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract GameFactory is Ownable {
-
-    constructor() {
-        gameIndex = 0;
-    }
+    constructor() {}
 
     uint256 entryFee = 0.001 ether;
 
@@ -19,7 +16,9 @@ contract GameFactory is Ownable {
     }
 
     enum GameSquare {
-        None, X, Y
+        None,
+        X,
+        Y
     }
 
     struct Game {
@@ -28,28 +27,27 @@ contract GameFactory is Ownable {
         GameSquare[3][3] board;
     }
 
-    mapping(uint256 => Game) private games;
-    uint256 private gameIndex;
+    mapping(uint256 => Game) public games;
+    uint256 public numGames;
 
-    function startGame(uint256 gameId) public payable {
+    event NewGame(address indexed playerX, uint256 gameId);
+
+    function startGame() public payable returns (uint256 gameId) {
         require(msg.value == entryFee);
-        _startGame(msg.sender, gameId);
-        // emit NewGame Event
+        gameId = numGames++;
+        Game storage g = games[gameId];
+        g.playerX = msg.sender;
+        emit NewGame(msg.sender, gameId);
     }
 
-    function _startGame(address player, uint256 gameId) private {
-        // create a new game and add a player
-    }
+    event NewPlayer(address indexed playerO, uint256 gameId);
 
     function joinGame(uint256 gameId) public payable {
         require(msg.value == entryFee);
-        // require that game is not full
-        _joinGame(msg.sender, gameId);
-        // emit NewPlayer Event
-    }
-
-    function _joinGame(address player, uint256 gameId) private {
-        // add player to game
+        Game storage g = games[gameId];
+        require(g.playerO == address(0), 'This game is full');
+        g.playerO = msg.sender;
+        emit NewPlayer(msg.sender, gameId);
     }
 
     // function makeMove
