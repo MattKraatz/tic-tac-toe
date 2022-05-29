@@ -2,16 +2,19 @@ import { expect } from 'chai';
 import { ethers, waffle } from 'hardhat';
 import web3 from 'web3';
 
-import GameArtifact from '../artifacts/contracts/Game.sol/Game.json';
-import { Game } from '../typechain-types/contracts/Game';
+import GameFactoryArtifact from '../artifacts/contracts/GameFactory.sol/GameFactory.json';
+import { GameFactory } from '../typechain-types/contracts/GameFactory';
 
 describe('Game', function () {
-  let game: Game;
+  let gameFactory: GameFactory;
 
   beforeEach(async () => {
     const [alice] = await ethers.getSigners();
 
-    game = (await waffle.deployContract(alice, GameArtifact)) as Game;
+    gameFactory = (await waffle.deployContract(
+      alice,
+      GameFactoryArtifact
+    )) as GameFactory;
 
     // TODO: test initial deployment state
   });
@@ -20,11 +23,11 @@ describe('Game', function () {
     const [, bob] = await ethers.getSigners();
 
     expect(
-      await game
+      await gameFactory
         .connect(bob)
         .startGame({ value: web3.utils.toWei('0.001', 'ether') })
     )
-      .to.emit(game, 'NewGame')
+      .to.emit(gameFactory, 'NewGame')
       .withArgs('from', 'id');
   });
 });

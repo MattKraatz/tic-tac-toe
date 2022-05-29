@@ -5,9 +5,11 @@ import "hardhat/console.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Game is Ownable {
+contract GameFactory is Ownable {
 
-    constructor() {}
+    constructor() {
+        gameIndex = 0;
+    }
 
     uint256 entryFee = 0.001 ether;
 
@@ -16,10 +18,34 @@ contract Game is Ownable {
         entryFee = _price;
     }
 
+    enum GameSquare {
+        None, X, Y
+    }
+
+    struct Game {
+        address playerX;
+        address playerO;
+        GameSquare[3][3] board;
+    }
+
+    mapping(uint256 => Game) private games;
+    uint256 private gameIndex;
+
+    function startGame(uint256 gameId) public payable {
+        require(msg.value == entryFee);
+        _startGame(msg.sender, gameId);
+        // emit NewGame Event
+    }
+
+    function _startGame(address player, uint256 gameId) private {
+        // create a new game and add a player
+    }
+
     function joinGame(uint256 gameId) public payable {
         require(msg.value == entryFee);
         // require that game is not full
         _joinGame(msg.sender, gameId);
+        // emit NewPlayer Event
     }
 
     function _joinGame(address player, uint256 gameId) private {
@@ -30,4 +56,5 @@ contract Game is Ownable {
     // require: player's turn
     // require: game is not over
     // require: move is available
+    // emit NewMove Event
 }
