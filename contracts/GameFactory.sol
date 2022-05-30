@@ -32,9 +32,9 @@ contract GameFactory is Ownable {
 
     event NewGame(address indexed playerX, uint256 gameId);
 
-    function startGame() public payable returns (uint256 gameId) {
+    function startGame() public payable {
         require(msg.value == entryFee);
-        gameId = numGames++;
+        uint256 gameId = numGames++;
         Game storage g = games[gameId];
         g.playerX = msg.sender;
         emit NewGame(msg.sender, gameId);
